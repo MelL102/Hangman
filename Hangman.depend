@@ -5,3 +5,10 @@
 	<string.h>
 	<ctype.h>
 
+1618324782 source:d:\programme\git\hangman\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<windows.h>
+
