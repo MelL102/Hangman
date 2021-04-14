@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 
 #include<windows.h>                                                     //library to use textcolors
 
@@ -46,7 +47,7 @@ void convert_to_upper(char solution[]){                                 //functi
 
 char input(char usedChars[]){                                           //function for input and input validation
 
-char input;
+    char input;
 
     while(1) {
         printf("Guess a letter: \n");
@@ -69,11 +70,54 @@ char input;
     }
 
 }
+//function to show the end screen of the game. See if you lost or won and displays statistics
+void show_win_loss_screen(char usedChars[], int attempts, int failed, int correct,char hiddenWord[], char solution[], int time_limit, unsigned long seconds) {
 
-void show_win_screen(char usedChars[], int attempts, char solution[]) { //function to show a new screen after you had guessed the word
+
     int i;
 
-    system("cls");                                                      //clear the console
+    system("cls");
+    printf("%lu seconds", seconds);
+    if(seconds > time_limit){printf("test");}                                                     //clear the console
+    if(strchr(hiddenWord, '_')|| seconds > time_limit){
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);        //change the textcolor
+    printf("\n\n____________________________________\n\n");
+
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);        //change the textcolor
+    printf("\n\nYou lost\n");
+
+    if(seconds > time_limit){
+        printf("You exceeded the time limit!\nTime Limit: %i minutes and %i seconds\nYour Time: %i minutes and %i seconds",time_limit/60,time_limit%60,seconds/60,seconds%60);
+    }
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);        //change the textcolor
+    printf("\n\nThe word was: ");
+    for(int i = 0; i<strlen(solution); i++){
+        printf("%c",solution[i]);
+    }
+    printf("\n");
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);        //reset the textcolor
+    printf("\n\nYour used chars: ");
+    for(i = 0; i < strlen(usedChars);i++){
+        printf("%c ",usedChars[i]);
+    }
+    printf("\n\nYour total guesses: %i", attempts);
+
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);        //change the textcolor
+    printf("\n\nYour correct guesses: %i\n",correct);
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 5);
+
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
+    printf("\nYour failed guesses: %i\n",failed);
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+
+
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);        //change the textcolor
+    printf("\n\n____________________________________\n\n");
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);        //reset the textcolor
+    scanf("");
+
+    }else{
+
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);        //change the textcolor
     printf("\n\n____________________________________\n\n");
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);        //change the textcolor
@@ -89,49 +133,108 @@ void show_win_screen(char usedChars[], int attempts, char solution[]) { //functi
     for(i = 0; i < strlen(usedChars);i++){
         printf("%c ",usedChars[i]);
     }
-    printf("\n\nYour guesses: %i", attempts);
+    printf("\n\nYour total guesses: %i", attempts);
+
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);        //change the textcolor
+    printf("\n\nYour correct guesses: %i\n",correct);
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 5);
+
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
+    printf("\nYour failed guesses: %i\n",failed);
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+
+    printf("\nYour Time: %i minutes and %i seconds",seconds/60,seconds%60);
+
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);        //change the textcolor
     printf("\n\n____________________________________\n\n");
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);        //reset the textcolor
     scanf("");
+    }
 }
 
 int main()
 {
     char in;
+    int t_input;
     char solution[MAX] = {"Justus"};
     char usedChars[MAX];
     char hiddenWord[MAX];
     int attempts = 0;
+    int failed = 0;
+    int correct = 0;
+    int tries = 10;
+    unsigned long start_time;
+    unsigned long end_time;
+    unsigned long seconds;
+    int time_limit = 10;
+    int seconds_formated = 0;
+    int minutes = 0;
+    int count = 0;
+    int limit = 0;
 
-    // WICHTIG SPAETER ENTFERNEN
-    //_____________________________
     convert_to_upper(solution);
+    while(1){                                                                   //Loop runs as long as you make invalid inputs
+        printf("Do you want to set a time Limit? Y/N\n");
+        scanf("%c",&in);
+        in = toupper(in);
+        fflush(stdin);
+        printf("%c\n",in);
+        if(in == 'Y' || in == 'N'){                                             //checks if you want a time limit or not
+            if(in == 'N'){
+                time_limit = 9999999999999;                                     //if N time limit is set to 9999999999999 seconds
+                system("cls");
+                break;
+            }else{
+                system("cls");
+                printf("Enter your time limit in seconds:\n");                  //lets you enter your time limit in seconds
+                scanf("%i",&t_input);
+                fflush(stdin);
+                time_limit = t_input;                                           //sets time limit to your input
+                system("cls");
+                printf("Time Limit of: %i minutes and %i seconds\n\nYour Time starts at your first guess!\n\n",time_limit/60, time_limit%60); //shows your time limit
+                break;
+            }
+
+        }else{
+            system("cls");
+        }
+    }
+
+    // REMOVE LATER!!!
+    //_____________________________
     for(int i = 0; i<strlen(solution); i++){
         printf("%c",solution[i]);
     }
+    printf("\n");
     //_____________________________
 
-    printf("\n");
+
+
     for(int i = 0; i<strlen(solution); i++){
         hiddenWord[i] = '_';
         printf("%c ",hiddenWord[i]);
     }
     printf("\n");
 
-    while(strchr(hiddenWord, '_')){
+    while(tries != 0){
+        printf("\nYou have %i tries left\n\n", tries);
         in = input(usedChars);
+        if(count == 0){                                                         //starts the timer after your first input count makes sure it only happens once
+            start_time = (unsigned long)time(NULL);                             //assigns the epoch time/Unix time to the variable start_time
+            count++;
+        }
         usedChars[attempts] = in;
-         if(strchr(solution, in)){
+         if(strchr(solution, in)){                                              //checks if your input char is in the solution string
 
                 SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);    //change the textcolor
                 system("cls");                                                  //clear the console
                 printf("You guessed correctly!!\n\n");
                 SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);    //reset the textcolor
+                correct++;
 
                 for(int i=0; i<strlen(hiddenWord);i++){
                     if(solution[i] == in){
-                        hiddenWord[i] = in;
+                        hiddenWord[i] = in;                                     //replaces the "_" in hidden word with your input
                     }
                 }
             }else{
@@ -139,15 +242,27 @@ int main()
                 system("cls");
                 printf("Loser\n\n");
                 SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+                failed++;
             }
         for(int i = 0; i<strlen(solution); i++){
         printf("%c ",hiddenWord[i]);
         }
         attempts++;
         show_used_chars_and_attempts(usedChars, attempts);
+        tries--;
+        end_time = (unsigned long)time(NULL);                                   //assigns the epoch time/Unix time to the variable end_time
+        minutes = (end_time - start_time)/60;                                   //converts epoch time into minutes
+        seconds_formated = (end_time - start_time)%60;                          //calculates the remaining seconds after minute conversion
+        seconds = end_time - start_time;                                        //calculates time passed in seconds
+        if(seconds >= time_limit){                                              //if the time limit is exceeded end the loop
+        break;
+    }
+        if(strchr(hiddenWord, '_') == 0){                                       // if the hidden word string no longer contains "_" end the loop
+           break;
+        }
     }
 
-    show_win_screen(usedChars, attempts, solution);
+    show_win_loss_screen(usedChars, attempts, failed, correct, hiddenWord, solution, time_limit, seconds);
 
 
     return 0;
