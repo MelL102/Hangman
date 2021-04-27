@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1618407760 source:i:\mega\codeblocks_workspace\hangman\hangman\main.c
+1619538340 source:i:\mega\codeblocks_workspace\hangman\hangman\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>

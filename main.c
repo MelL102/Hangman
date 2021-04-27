@@ -4,9 +4,36 @@
 #include <ctype.h>
 #include <time.h>
 
-#include<windows.h>                                                     //library to use textcolors
+#include<windows.h>                                           //library to use textcolors
 
 #define MAX 255
+
+void pick_solution(char* solution){                          //takes the pointer "solution" as parameter and picks a random word from a file and copies it into solution
+
+    int i = 0;                                               //variable i is declared to later assign its value to the variable line_number to get the number of lines read
+    int line_number;
+    int random_number;
+
+
+    FILE *the_file = fopen("words.txt", "r");                // declares which file to read
+    if(the_file == NULL){                                    //if the file can't be opened print out an error message
+        printf("Unable to open the file");
+    }
+    char line[20][200];                                      //declare array to store the words
+    while(fgets(line[i], 200, the_file)){                    //read from the text document and store in array
+        i++;
+    }
+    line_number = i;
+
+    srand(time(NULL));                                      //initialize the random number generator
+
+    random_number = rand() % line_number;                   //assigns a random number from 0 to the value of variable line_number to random_number
+
+    strcpy(solution, line[random_number]);                  //copies a random word in the string solution
+}
+
+
+
 
 void show_used_chars_and_attempts(char usedChars[], int attempts){      //function to show used chars and the number of attempts made
     char tmp;
@@ -156,7 +183,7 @@ int main()
 {
     char in;
     int t_input;
-    char solution[MAX] = {"Justus"};
+    char solution[MAX];
     char usedChars[MAX];
     char hiddenWord[MAX];
     int attempts = 0;
@@ -172,6 +199,7 @@ int main()
     int count = 0;
     int limit = 0;
 
+    pick_solution(solution);
     convert_to_upper(solution);
     while(1){                                                                   //Loop runs as long as you make invalid inputs
         printf("Do you want to set a time Limit? Y/N\n");
@@ -210,7 +238,7 @@ int main()
 
 
 
-    for(int i = 0; i<strlen(solution); i++){
+    for(int i = 0; i<strlen(solution); i++){                                    //bug here or at string value assignment: Peter works but Justus and Jonas seem to have an extra char at the end
         hiddenWord[i] = '_';
         printf("%c ",hiddenWord[i]);
     }
