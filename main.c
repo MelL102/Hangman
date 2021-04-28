@@ -21,6 +21,7 @@ void pick_solution(char* solution){                          //takes the pointer
     }
     char line[20][200];                                      //declare array to store the words
     while(fgets(line[i], 200, the_file)){                    //read from the text document and store in array
+        line[i][strcspn(line[i], "\n")] = 0;
         i++;
     }
     line_number = i;
@@ -38,7 +39,7 @@ void pick_solution(char* solution){                          //takes the pointer
 void show_used_chars_and_attempts(char usedChars[], int attempts){      //function to show used chars and the number of attempts made
     char tmp;
     int i, j;
-    for(i = 0; i < strlen(usedChars);i++){                              //bubble sort to sort used chars !NOT WORKING PROPERLY ATM THIRD OR FOURTH CHARAKTER IS BUGGED
+    for(i = 0; i < strlen(usedChars);i++){                              //bubble sort to sort used chars
         for(j = 0; j < strlen(usedChars)-1;j++){
 
             if(usedChars[j] > usedChars[j+1]){
@@ -184,7 +185,7 @@ int main()
     char in;
     int t_input;
     char solution[MAX];
-    char usedChars[MAX];
+    char usedChars[MAX] = {0};
     char hiddenWord[MAX];
     int attempts = 0;
     int failed = 0;
@@ -238,7 +239,7 @@ int main()
 
 
 
-    for(int i = 0; i<strlen(solution); i++){                                    //bug here or at string value assignment: Peter works but Justus and Jonas seem to have an extra char at the end
+    for(int i = 0; i<strlen(solution); i++){
         hiddenWord[i] = '_';
         printf("%c ",hiddenWord[i]);
     }
