@@ -8,9 +8,10 @@
 
 #define MAX 255
 
+
 int main()
 {
-    char in;
+    int in;
     int t_input;
     char solution[MAX];
     char usedChars[MAX] = {0};
@@ -27,36 +28,50 @@ int main()
     int minutes = 0;
     int count = 0;
     //int limit = 0;
-    char username[255];
+    char *username;
+    char users[255];
+    int user_input = 0;
 
-    printf("Please enter your username: \n");
-    scanf("%s", &username);                                                     //get the username from the console input
+    show_users();
+
+    printf("\n> ");
+    scanf("%i", &user_input);                                                     //get the username from the console input
+
+    if(user_input == 0) {
+        printf("Please enter your username: ");
+        scanf("%s", username);
+        create_user(username);
+    }
+    else {
+        username = get_user(user_input);
+    }
 
     pick_solution(solution);
     convert_to_upper(solution);
-    while(1)                                                                    //Loop runs as long as you make invalid inputs
-    {
-        printf("Do you want to set a time Limit? Y/N\n");
-        scanf("%c",&in);
-        in = toupper(in);
+
+    system("cls");
+
+    do {                                                                        //Loop runs as long as you make invalid inputs
+        printf("Do you want to set a time Limit?\n");
+        printf("1. Yes\n");
+        printf("2. No\n");
+        scanf("%i",&in);
         fflush(stdin);
-        printf("%c\n",in);
-        if(in == 'Y' || in == 'N')                                              //checks if you want a time limit or not
+
+        if(in == 1 || in == 2)                                              //checks if you want a time limit or not
         {
-            if(in == 'N')
+
+            if(in == 2)
             {
                 time_limit = 99999999;                                     //if N time limit is set to 9999999999999 seconds
-                system("cls");
                 break;
             }
             else
             {
-                system("cls");
                 printf("Enter your time limit in seconds:\n");                  //lets you enter your time limit in seconds
                 scanf("%i",&t_input);
                 fflush(stdin);
                 time_limit = t_input;                                           //sets time limit to your input
-                system("cls");
                 printf("Time Limit of: %li minutes and %li seconds\n\nYour Time starts at your first guess!\n\n",time_limit/60, time_limit%60); //shows your time limit
                 break;
             }
@@ -65,10 +80,20 @@ int main()
         else
         {
             system("cls");
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
+            printf("You have made a wrong input!\n");
+            printf("Try again!\n\n");
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+
         }
-    }
+
+    } while (1);
+
+    system("cls");
 
     // REMOVE LATER!!!
+     printf("TEST: %s\n", username);
+
     //_____________________________
     for(int i = 0; i<strlen(solution); i++)
     {

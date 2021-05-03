@@ -121,6 +121,68 @@ void print_hangman(int failed)                                  //shows hangman 
     }
 }
 
+void create_user(char *username) {
+
+    FILE *the_file = fopen("users.txt", "a");
+
+    fprintf(the_file, username);
+    fprintf(the_file, "\n");
+
+    fclose(the_file);
+
+}
+
+char get_user(int input_user) {
+
+    int i = 0;
+
+    char *user;
+
+    FILE *the_file = fopen("users.txt", "r");                // declares which file to read
+    if(the_file == NULL)                                     //if the file can't be opened print out an error message
+    {
+        printf("Unable to open the file");
+    }
+
+    char userline[20][255];
+
+
+    while(fgets(userline[i], 255, the_file))                     //read from the text document and store in array
+    {
+        userline[i][strcspn(userline[i], "\n")] = 0;
+
+        user = userline[input_user - 1];
+        i++;
+    }
+
+    return user;
+
+}
+
+void show_users() {
+
+    int i = 0;
+
+    FILE *the_file = fopen("users.txt", "r");                // declares which file to read
+    if(the_file == NULL)                                     //if the file can't be opened print out an error message
+    {
+        printf("Unable to open the file");
+    }
+
+    char line[20][200];
+
+    printf("0. Create new user \n\n");
+
+    while(fgets(line[i], 200, the_file))                     //read from the text document and store in array
+    {
+        line[i][strcspn(line[i], "\n")] = 0;
+        printf("%i. %s \n", i+1, line[i]);
+        i++;
+    }
+
+}
+
+
 void pick_solution(char* solution)                           //takes the pointer "solution" as parameter and picks a random word from a file and copies it into solution
 {
 
