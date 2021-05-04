@@ -8,6 +8,12 @@
 
 #define MAX 255
 
+struct highscore_user
+{
+    char username[255];
+    int score;
+};
+
 void print_hangman(int failed)                                  //shows hangman in ASCII in the console using counter "failed"
 {
 
@@ -121,6 +127,143 @@ void print_hangman(int failed)                                  //shows hangman 
     }
 }
 
+void create_highscore_in_list(char *username, int tries, int time, char *word)
+{
+
+    FILE *the_file = fopen("highscorelist.csv", "a");
+
+    fprintf(the_file, "Username: ; Tries: ; Time in seconds: ; Word: ;\n");
+    fprintf(the_file, "%s ; %i ; %i ; %s ;\n", username, tries, time, word);
+
+    fclose(the_file);
+
+}
+
+void create_highscore(char *username, int tries, int time)
+{
+
+    FILE *the_file = fopen("highscores.txt", "a");
+
+    if(tries < 10)
+    {
+        fprintf(the_file, "%i  %s", tries, username);           // usernername  tries   time
+    }
+    else
+    {
+        fprintf(the_file, "%i %s", tries, username);           // usernername  tries   time
+    }
+    fprintf(the_file, "\n");
+
+    fclose(the_file);
+}
+
+void show_highscores()
+{
+
+    struct highscore_user highscore_struct[255];
+
+    char tempstr[255];
+
+    int temp, i, j, k;
+
+    char highscoreline[20][255];
+
+
+    FILE *the_file_to_read = fopen("highscores.txt", "r");
+
+    for(i = 0; i < 255; i++)
+    {
+        fgets(highscoreline[i], 255, the_file_to_read);
+
+        strcpy(highscore_struct[i].username, highscoreline[i]+2);
+        highscore_struct[i].score = atoi(highscoreline[i]);
+
+    }
+
+    for (j = 0; j < strlen(highscoreline); j++)
+    {
+        for (k = j + 1; k < strlen(highscoreline); k++)
+        {
+            if (highscore_struct[j].score > highscore_struct[k].score)
+            {
+                temp = highscore_struct[j].score;
+                highscore_struct[j].score= highscore_struct[k].score;
+                highscore_struct[k].score = temp;
+
+                strcpy(tempstr, highscore_struct[j].username);
+                strcpy(highscore_struct[j].username, highscore_struct[k].username);
+                strcpy(highscore_struct[k].username, tempstr);
+            }
+        }
+    }
+
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);
+    printf("===- HIGHSCORES -===\n");
+    for (i = 0; i < 6; ++i) {
+        printf("%i. [%i] %s", i+1, highscore_struct[i].score, highscore_struct[i].username);
+    }
+
+}
+
+void create_user(char *username)
+{
+
+    FILE *the_file = fopen("users.txt", "a");
+
+    fprintf(the_file, "%s\n", username);
+
+    fclose(the_file);
+
+}
+
+void get_user(int input_user, char user[])
+{
+
+    int i = 0;
+
+    FILE *the_file = fopen("users.txt", "r");                // declares which file to read
+    if(the_file == NULL)                                     //if the file can't be opened print out an error message
+    {
+        printf("Unable to open the file");
+    }
+
+    char userline[20][255];
+
+
+    while(fgets(userline[i], 255, the_file))                     //read from the text document and store in array
+    {
+        userline[i][strcspn(userline[i], "\n")] = 0;
+
+        strcpy(user, userline[input_user - 1]);
+        i++;
+    }
+}
+
+void show_users()
+{
+
+    int i = 0;
+
+    FILE *the_file = fopen("users.txt", "r");                // declares which file to read
+    if(the_file == NULL)                                     //if the file can't be opened print out an error message
+    {
+        printf("Unable to open the file");
+    }
+
+    char line[20][200];
+
+    printf("0. Create new user \n\n");
+
+    while(fgets(line[i], 200, the_file))                     //read from the text document and store in array
+    {
+        line[i][strcspn(line[i], "\n")] = 0;
+        printf("%i. %s \n", i+1, line[i]);
+        i++;
+    }
+
+}
+
+
 void pick_solution(char* solution)                           //takes the pointer "solution" as parameter and picks a random word from a file and copies it into solution
 {
 
@@ -229,25 +372,22 @@ char input(char usedChars[])                                            //functi
 
 }
 
-void show_win_loss_screen(char usedChars[], int attempts, int failed, int correct,char hiddenWord[], char solution[], long time_limit, unsigned long seconds) //function to show the end screen of the game. See if you lost or won and displays statistics
+void show_win_loss_screen(char username[], char usedChars[], int attempts, int failed, int correct,char hiddenWord[], char solution[], long time_limit, unsigned long seconds) //function to show the end screen of the game. See if you lost or won and displays statistics
 {
 
     int i;
     char close;
 
     system("cls");                                                          //clear the console
-    if(seconds > time_limit)
-    {
-        printf("test");
-    }
+
     if(strchr(hiddenWord, '_')|| seconds > time_limit)
     {
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);        //change the textcolor in to grey
-        printf("\n\n____________________________________\n\n");
+        printf("\n____________________________________\n\n");
 
+        printf("%s:\n\n", username);
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);        //change the textcolor in to dark red
         printf("You lost\n");
-
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);        //change the textcolor in to grey
 
         print_hangman(failed);
@@ -283,15 +423,14 @@ void show_win_loss_screen(char usedChars[], int attempts, int failed, int correc
         printf("\n\n____________________________________\n\n");
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);        //change the textcolor in to white
 
-        printf("Press a button to close!");
-        scanf("%c", &close);
-
     }
     else
     {
 
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);        //change the textcolor in to grey
-        printf("\n\n____________________________________\n\n");
+        printf("\n____________________________________\n\n");
+
+        printf("%s:\n\n", username);
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);        //change the textcolor in to green
         printf("You have figured out the word\n");
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);        //change the textcolor in to grey
@@ -325,8 +464,10 @@ void show_win_loss_screen(char usedChars[], int attempts, int failed, int correc
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);        //change the textcolor in to grey
         printf("\n\n____________________________________\n\n");
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);        //change the textcolor in to white
-
-        printf("Press a button to close!");
-        scanf("%c", &close);
     }
+
+    show_highscores();
+
+    printf("\nPress a button to close!");
+    scanf("%c", &close);
 }

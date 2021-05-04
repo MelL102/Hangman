@@ -3,14 +3,16 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include "hangman.h"
 
 #include<windows.h>                                             //library to use textcolors
 
 #define MAX 255
 
+
 int main()
 {
-    char in;
+    int in;
     int t_input;
     char solution[MAX];
     char usedChars[MAX] = {0};
@@ -18,7 +20,6 @@ int main()
     int attempts = 0;
     int failed = 0;
     int correct = 0;
-    int tries = 10;
     unsigned long start_time;
     unsigned long end_time;
     unsigned long seconds;
@@ -26,37 +27,49 @@ int main()
     int seconds_formated = 0;
     int minutes = 0;
     int count = 0;
-    //int limit = 0;
     char username[255];
+    int user_input = 0;
 
-    printf("Please enter your username: \n");
-    scanf("%s", &username);                                                     //get the username from the console input
+    show_users();
+
+    printf("\n> ");
+    scanf("%i", &user_input);                                                     //get the username from the console input
+
+    if(user_input == 0) {
+        printf("Please enter your username: ");
+        scanf("%s", username);
+        create_user(username);
+    }
+    else {
+        get_user(user_input, username);
+    }
 
     pick_solution(solution);
     convert_to_upper(solution);
-    while(1)                                                                    //Loop runs as long as you make invalid inputs
-    {
-        printf("Do you want to set a time Limit? Y/N\n");
-        scanf("%c",&in);
-        in = toupper(in);
+
+    system("cls");
+
+    do {                                                                        //Loop runs as long as you make invalid inputs
+        printf("Do you want to set a time Limit?\n");
+        printf("1. Yes\n");
+        printf("2. No\n");
+        scanf("%i",&in);
         fflush(stdin);
-        printf("%c\n",in);
-        if(in == 'Y' || in == 'N')                                              //checks if you want a time limit or not
+
+        if(in == 1 || in == 2)                                              //checks if you want a time limit or not
         {
-            if(in == 'N')
+
+            if(in == 2)
             {
                 time_limit = 99999999;                                     //if N time limit is set to 9999999999999 seconds
-                system("cls");
                 break;
             }
             else
             {
-                system("cls");
                 printf("Enter your time limit in seconds:\n");                  //lets you enter your time limit in seconds
                 scanf("%i",&t_input);
                 fflush(stdin);
                 time_limit = t_input;                                           //sets time limit to your input
-                system("cls");
                 printf("Time Limit of: %li minutes and %li seconds\n\nYour Time starts at your first guess!\n\n",time_limit/60, time_limit%60); //shows your time limit
                 break;
             }
@@ -65,19 +78,16 @@ int main()
         else
         {
             system("cls");
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
+            printf("You have made a wrong input!\n");
+            printf("Try again!\n\n");
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+
         }
-    }
 
-    // REMOVE LATER!!!
-    //_____________________________
-    for(int i = 0; i<strlen(solution); i++)
-    {
-        printf("%c",solution[i]);
-    }
-    printf("\n");
-    //_____________________________
+    } while (1);
 
-
+    system("cls");
 
     for(int i = 0; i<strlen(solution); i++)
     {
@@ -86,9 +96,8 @@ int main()
     }
     printf("\n");
 
-    while(tries != 0)
+    while(failed != 10)
     {
-        printf("\nYou have %i tries left\n\n", tries);
         in = input(usedChars);
         if(count == 0)                                                          //starts the timer after your first input count makes sure it only happens once
         {
@@ -129,7 +138,6 @@ int main()
         }
         attempts++;
         show_used_chars_and_attempts(usedChars, attempts);
-        tries--;
         end_time = (unsigned long)time(NULL);                                   //assigns the epoch time/Unix time to the variable end_time
         minutes = (end_time - start_time)/60;                                   //converts epoch time into minutes
         seconds_formated = (end_time - start_time)%60;                          //calculates the remaining seconds after minute conversion
@@ -144,8 +152,9 @@ int main()
         }
     }
 
-    show_win_loss_screen(usedChars, attempts, failed, correct, hiddenWord, solution, time_limit, seconds);
-
+    create_highscore(username, attempts);
+    create_highscore_in_list(username, attempts, seconds, solution);
+    show_win_loss_screen(username, usedChars, attempts, failed, correct, hiddenWord, solution, time_limit, seconds);
 
     return 0;
 }
