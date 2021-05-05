@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include "hangman.h"
 
 #include<windows.h>                                             //library to use textcolors
 
@@ -19,7 +20,6 @@ int main()
     int attempts = 0;
     int failed = 0;
     int correct = 0;
-    int tries = 10;
     unsigned long start_time;
     unsigned long end_time;
     unsigned long seconds;
@@ -27,9 +27,7 @@ int main()
     int seconds_formated = 0;
     int minutes = 0;
     int count = 0;
-    //int limit = 0;
-    char *username;
-    char users[255];
+    char username[255];
     int user_input = 0;
 
     show_users();
@@ -43,7 +41,7 @@ int main()
         create_user(username);
     }
     else {
-        username = get_user(user_input);
+        get_user(user_input, username);
     }
 
     pick_solution(solution);
@@ -91,19 +89,6 @@ int main()
 
     system("cls");
 
-    // REMOVE LATER!!!
-     printf("TEST: %s\n", username);
-
-    //_____________________________
-    for(int i = 0; i<strlen(solution); i++)
-    {
-        printf("%c",solution[i]);
-    }
-    printf("\n");
-    //_____________________________
-
-
-
     for(int i = 0; i<strlen(solution); i++)
     {
         hiddenWord[i] = '_';
@@ -111,9 +96,8 @@ int main()
     }
     printf("\n");
 
-    while(tries != 0)
+    while(failed != 10)
     {
-        printf("\nYou have %i tries left\n\n", tries);
         in = input(usedChars);
         if(count == 0)                                                          //starts the timer after your first input count makes sure it only happens once
         {
@@ -154,7 +138,6 @@ int main()
         }
         attempts++;
         show_used_chars_and_attempts(usedChars, attempts);
-        tries--;
         end_time = (unsigned long)time(NULL);                                   //assigns the epoch time/Unix time to the variable end_time
         minutes = (end_time - start_time)/60;                                   //converts epoch time into minutes
         seconds_formated = (end_time - start_time)%60;                          //calculates the remaining seconds after minute conversion
@@ -169,8 +152,9 @@ int main()
         }
     }
 
-    show_win_loss_screen(usedChars, attempts, failed, correct, hiddenWord, solution, time_limit, seconds);
-
+    create_highscore(username, attempts);
+    create_highscore_in_list(username, attempts, seconds, solution);
+    show_win_loss_screen(username, usedChars, attempts, failed, correct, hiddenWord, solution, time_limit, seconds);
 
     return 0;
 }
